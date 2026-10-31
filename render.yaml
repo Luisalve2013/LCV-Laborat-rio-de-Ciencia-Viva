@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: lcv-laboratorio-de-ciencia-viva
+    runtime: python
+    buildCommand: pip install flask gunicorn
+    startCommand: gunicorn app:app
+    plan: free
