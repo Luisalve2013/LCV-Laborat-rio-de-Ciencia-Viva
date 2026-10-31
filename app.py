@@ -2,8 +2,9 @@ import os
 import sqlite3
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='.')
 app.secret_key = 'lcv_chave_secreta_super_segura'
+
 
 # No Render, guardamos na pasta /tmp para garantir permissões de escrita gratuitas
 DATABASE = '/tmp/lcv_database.db'
