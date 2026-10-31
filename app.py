@@ -2,12 +2,12 @@ import os
 import sqlite3
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 
+# Configurou-se para ler os HTMLs soltos na pasta principal (.)
 app = Flask(__name__, template_folder='.')
 app.secret_key = 'lcv_chave_secreta_super_segura'
 
-
-# No Render, guardamos na pasta /tmp para garantir permissões de escrita gratuitas
-DATABASE = '/tmp/lcv_database.db'
+# Mudança crucial: a base de dados fica guardada na pasta principal do projeto
+DATABASE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'lcv_database.db')
 
 def get_db_connection():
     conn = sqlite3.connect(DATABASE)
@@ -34,7 +34,7 @@ def init_db():
                         password TEXT NOT NULL,
                         nivel INTEGER NOT NULL)''')
     
-    # Verificar se o Luis existe
+    # Verificar se o Luis existe, se não, cria
     user = conn.execute('SELECT * FROM utilizadores WHERE username = ?', ('Luis',)).fetchone()
     if not user:
         conn.execute('DELETE FROM utilizadores')
@@ -43,7 +43,7 @@ def init_db():
     conn.commit()
     conn.close()
 
-# FORÇAR A CRIAÇÃO DA BASE DE DADOS ASSIM QUE O SCRIPT CARREGA
+# FORÇAR A CRIAÇÃO IMEDIATA DAS TABELAS
 init_db()
 
 @app.route('/')
@@ -171,6 +171,5 @@ def criar_professor():
     return redirect(url_for('dashboard'))
 
 if __name__ == '__main__':
-    # O Render exige que o Flask leia a porta do ambiente
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
