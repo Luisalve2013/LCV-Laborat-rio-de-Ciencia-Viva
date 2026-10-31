@@ -15,6 +15,7 @@ def get_db_connection():
 
 def init_db():
     conn = get_db_connection()
+    # Criar as tabelas caso não existam
     conn.execute('''CREATE TABLE IF NOT EXISTS conteudos (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         texto TEXT NOT NULL,
@@ -32,6 +33,7 @@ def init_db():
                         password TEXT NOT NULL,
                         nivel INTEGER NOT NULL)''')
     
+    # Verificar se o Luis existe
     user = conn.execute('SELECT * FROM utilizadores WHERE username = ?', ('Luis',)).fetchone()
     if not user:
         conn.execute('DELETE FROM utilizadores')
@@ -39,6 +41,9 @@ def init_db():
     
     conn.commit()
     conn.close()
+
+# FORÇAR A CRIAÇÃO DA BASE DE DADOS ASSIM QUE O SCRIPT CARREGA
+init_db()
 
 @app.route('/')
 def index():
@@ -165,7 +170,6 @@ def criar_professor():
     return redirect(url_for('dashboard'))
 
 if __name__ == '__main__':
-    init_db()
     # O Render exige que o Flask leia a porta do ambiente
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
