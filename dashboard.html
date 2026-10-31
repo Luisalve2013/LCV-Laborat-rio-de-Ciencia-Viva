@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-5 pb-3 border-bottom gap-3">
+    <div>
+        <h1 class="fw-bold text-dark m-0" style="letter-spacing: -1px;">Consola de Gestão</h1>
+        <p class="text-muted m-0">Controla as publicações, presenças dos alunos e acessos à plataforma.</p>
+    </div>
+    <div>
+        <span class="badge-premium">Nível de Autorização: {{ session['nivel'] }}</span>
+    </div>
+</div>
+
+<div class="row">
+    <!-- COLUNA 1: ADICIONAR CONTEÚDOS PÚBLICOS -->
+    <div class="col-lg-5 mb-4">
+        <div class="card h-100">
+            <div class="card-body p-4">
+                <h5 class="fw-bold text-dark mb-3">📢 Publicar no Mural</h5>
+                <p class="text-muted small mb-4">Adiciona múltiplos textos e fotos que aparecem instantaneamente na página inicial do clube.</p>
+                
+                <form action="{{ url_for('adicionar_conteudo') }}" method="POST" class="mb-4">
+                    <div class="mb-3">
+                        <label class="form-label small fw-medium text-secondary">Texto da Publicação</label>
+                        <textarea name="texto" class="form-control" rows="3" placeholder="O que aconteceu no laboratório hoje? Descrição do projeto..." required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-medium text-secondary">URL da Imagem (Link)</label>
+                        <input type="url" name="imagem_url" class="form-control" placeholder="https://exemplo.com" required>
+                    </div>
+                    <button type="submit" class="btn btn-success btn-sm w-100 py-2">Publicar Conteúdo</button>
+                </form>
+
+                <h6 class="fw-bold text-dark small mb-3">Elementos Ativos no Site:</h6>
+                <div class="d-flex flex-column gap-2">
+                    {% for c in conteudos %}
+                        <div class="p-3 bg-light rounded-3 d-flex justify-content-between align-items-center border border-light">
+                            <div class="text-truncate pe-2" style="max-width: 75%;">
+                                <strong class="small d-block text-truncate text-dark">{{ c.texto }}</strong>
+                            </div>
+                            <a href="{{ url_for('remover_conteudo', id=c.id) }}" class="btn btn-outline-danger btn-sm py-1 px-2.5 text-decoration-none small" style="font-size: 0.8rem;">Apagar</a>
+                        </div>
+                    {% endfor %}
+                    {% if not conteudos %}
+                        <p class="text-muted small text-center my-3">Nenhum bloco de informação ativo.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- COLUNA 2: LISTAGEM DE COLABORADORES E PRESENÇAS -->
+    <div class="col-lg-7 mb-4">
+        <div class="card h-100">
+            <div class="card-body p-4">
+                <h5 class="fw-bold text-dark mb-1">👥 Fichas & Chamada Diária</h5>
+                <p class="text-muted small mb-4">Adiciona colaboradores, edita dados diretamente na tabela e valida presenças.</p>
+                
+                <form action="{{ url_for('adicionar_colaborador') }}" method="POST" class="row g-2 mb-4">
+                    <div class="col-md-6">
+                        <input type="text" name="nome" class="form-control form-control-sm" placeholder="Nome Completo do Aluno" required>
+                    </div>
+                    <div class="col-md-4">
+                        <input type="text" name="cargo_turma" class="form-control form-control-sm" placeholder="Turma ou Cargo" required>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary btn-sm w-100 py-2">Registar</button>
+                    </div>
+                </form>
+
+                <div class="table-responsive rounded-3 border">
+                    <table class="table table-hover align-middle mb-0" style="font-size: 0.95rem;">
+                        <thead class="table-light text-secondary small">
+                            <tr>
+                                <th class="ps-3 py-3">Nome do Colaborador</th>
+                                <th class="py-3">Turma/Função</th>
+                                <th class="text-center py-3">Presenças</th>
+                                <th class="text-end pe-3 py-3">Ações rápidas</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for colab in colaboradores %}
+                            <tr>
+                                <form action="{{ url_for('editar_colaborador', id=colab.id) }}" method="POST">
+                                    <td class="ps-3">
+                                        <input type="text" name="nome" value="{{ colab.nome }}" class="form-control form-control-sm border-0 bg-transparent fw-medium p-0 text-dark" required>
+                                    </td>
+                                    <td>
+                                        <input type="text" name="cargo_turma" value="{{ colab.cargo_turma }}" class="form-control form-control-sm border-0 bg-transparent p-0 text-muted" required>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge rounded-pill bg-dark px-2.5 py-1.5">{{ colab.presencas }}</span>
+                                    </td>
+                                    <td class="text-end pe-3">
+                                        <div class="d-inline-flex gap-1">
+                                            <button type="submit" class="btn btn-light btn-sm border py-1 px-2" title="Guardar alteração">💾</button>
+                                            <a href="{{ url_for('marcar_presenca', id=colab.id) }}" class="btn btn-success btn-sm py-1 px-2.5 text-white" title="Somar 1 Presença">✓ Presença</a>
+                                            <a href="{{ url_for('remover_colaborador', id=colab.id) }}" class="btn btn-outline-danger btn-sm py-1 px-2" title="Remover">✕</a>
+                                        </div>
+                                    </td>
+                                </form>
+                            </tr>
+                            {% endfor %}
+                            {% if not colaboradores %}
+                                <tr>
+                                    <td colspan="4" class="text-center py-4 text-muted bg-white small">Nenhum colaborador inserido no sistema.</td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SECÇÃO INFERIOR: CONFIGURAÇÃO DE NOVOS PROFESSORES (Exclusivo Nível 2) -->
+{% if session['nivel'] == 2 %}
+<div class="row mt-2">
+    <div class="col-12">
+        <div class="card bg-dark text-white border-0 shadow-md">
+            <div class="card-body p-4">
+                <h5 class="fw-bold text-white mb-1">🛠️ Administração Geral e Permissões</h5>
+                <p class="text-white-50 small mb-4">Menu restrito para a criação de novos utilizadores docentes e delegação de competências.</p>
+                
+                <form action="{{ url_for('criar_professor') }}" method="POST" class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label small text-white-50">Nome de Utilizador</label>
+                        <input type="text" name="username" class="form-control bg-secondary border-0 text-white" placeholder="Ex: prof_silva" required autocomplete="off">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small text-white-50">Definir Password</label>
+                        <input type="password" name="password" class="form-control bg-secondary border-0 text-white" placeholder="Senha inicial" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small text-white-50">Nível de Acesso Comercial</label>
+                        <select name="nivel" class="form-select bg-secondary border-0 text-white">
+                            <option value="1">Nível 1 (Gestão Comum)</option>
+                            <option value="2">Nível 2 (Gestão Total / Criar Contas)</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="submit" class="btn btn-light w-100 py-2 fw-medium text-dark">Criar Credencial</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

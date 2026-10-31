@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block content %}
+<!-- Banner de Boas-Vindas Elegante -->
+<div class="row align-items-center py-5 my-4 bg-white rounded-4 border px-4 px-md-5 shadow-sm">
+    <div class="col-lg-7">
+        <span class="badge mb-3" style="background-color: #e0e7ff; color: #4338ca; font-weight: 600; padding: 0.5rem 1rem; border-radius: 20px;">Espaço de Inovação Escolar</span>
+        <h1 class="display-5 fw-bold text-dark tracking-tight mb-3">Laboratório Ciência Viva</h1>
+        <p class="fs-5 text-muted mb-4">Investigação prática, robótica e pensamento crítico. Aqui, os alunos transformam grandes ideias científicas em projetos reais.</p>
+        <a href="#atividades" class="btn btn-primary px-4 py-2.5 shadow-sm">Ver Atividades</a>
+    </div>
+    <div class="col-lg-5 d-none d-lg-block text-center">
+        <span style="font-size: 8rem;">🔬</span>
+    </div>
+</div>
+
+<!-- Grelha de Atividades Publicadas -->
+<div id="atividades" class="pt-4">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h2 class="fw-bold m-0" style="letter-spacing: -0.5px;">Mural do Laboratório</h2>
+            <p class="text-muted small m-0">Atualizado recentemente pelos professores responsáveis</p>
+        </div>
+    </div>
+    
+    <div class="row">
+        {% if conteudos %}
+            {% for c in conteudos %}
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100 border-0 shadow-sm overflow-hidden" style="background: #ffffff; border: 1px solid #f1f5f9 !important;">
+                        {% if c.imagem_url %}
+                            <img src="{{ c.imagem_url }}" class="card-img-top" alt="Atividade" style="height: 200px; object-fit: cover;">
+                        {% endif %}
+                        <div class="card-body p-4">
+                            <p class="card-text text-secondary mb-0 style-text" style="font-size: 1rem; line-height: 1.6;">{{ c.texto }}</p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12 text-center py-5 bg-white rounded-4 border">
+                <span style="font-size: 2.5rem; d-block mb-3">💡</span>
+                <h5 class="fw-semibold text-dark">O mural está vazio</h5>
+                <p class="text-muted small">Inicia sessão na área restrita para adicionares os primeiros textos e fotos.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
