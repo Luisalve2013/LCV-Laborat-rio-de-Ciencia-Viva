@@ -1,6 +1,1 @@
-services:
-  - type: web
-    name: o-seu-app
-    runtime: python
-    buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn app:app
+
